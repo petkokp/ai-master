@@ -1,0 +1,137 @@
+\documentclass{article}
+\usepackage{graphicx}
+
+\title{Information theory TP 1}
+\author{Petko Petkov}
+
+\begin{document}
+
+\date{}
+\maketitle
+
+\section*{Problem 1}
+
+\[
+KL(p \| q) = \sum_{x \in X} p(x) \log \frac{p(x)}{q(x)} \geq 0
+\]
+
+Express KL divergence and use Jensen's inequality:
+
+\[
+KL(p \| q) = \sum_{x \in X} p(x) \log \frac{p(x)}{q(x)}
+\]
+
+\( f(t) = \log t \) (strictly concave).
+
+\vspace{5mm}
+
+Apply Jensen’s inequality to the function:
+
+\[
+\mathbb{E}[f(X)] \leq f(\mathbb{E}[X])
+\]
+
+for a probability distribution, we get:
+
+\[
+\sum_{x \in X} p(x) \log \frac{p(x)}{q(x)} \geq \log \sum_{x \in X} p(x) \frac{p(x)}{q(x)}
+\]
+
+Since \( \sum_{x \in X} p(x) = 1 \), the right-hand side simplifies to:
+
+\[
+\log \sum_{x \in X} p(x) = \log 1 = 0.
+\]
+
+\vspace{5mm}
+
+Thus,
+
+\[
+KL(p \| q) \geq 0.
+\]
+
+Jensen’s inequality achieves equality if and only if \( \frac{p(x)}{q(x)} \) is constant for all \( x \), which means \( p(x) = q(x) \) for all \( x \). Hence, KL divergence is zero if and only if \( p = q \).
+
+\vspace{5mm}
+Thus,
+
+\[
+KL(p \| q) \geq 0
+\]
+
+with equality if and only if \( p = q \).
+
+\section*{Problem 2}
+
+\subsection*{a)} Bayes’ theorem:
+
+\[
+\pi(\theta) = p(\theta | D) = \frac{p(D | \theta) \alpha(\theta)}{p(D)}
+\]
+
+Taking the natural logarithm on both sides:
+
+\[
+\ln \pi(\theta) = \ln p(\theta | D) = \ln p(D | \theta) + \ln \alpha(\theta) - \ln p(D)
+\]
+
+\subsection*{b)}
+
+\[
+\mathbb{E}_{\theta \sim \beta} [\ln \pi(\theta)] = \mathbb{E}_{\theta \sim \beta} \left[\ln p(D | \theta) + \ln \alpha(\theta) - \ln p(D)\right]
+\]
+
+Since \( p(D) \) is independent of \( \theta \), we can write:
+
+\[
+\mathbb{E}_{\theta \sim \beta} [\ln p(\theta | D)] = \mathbb{E}_{\theta \sim \beta} [\ln p(D | \theta)] + \mathbb{E}_{\theta \sim \beta} [\ln \alpha(\theta)] - \ln p(D)
+\]
+
+Rearranging:
+
+\[
+\ln p(D) = \mathbb{E}_{\theta \sim \beta} [\ln p(D | \theta)] + \mathbb{E}_{\theta \sim \beta} [\ln \alpha(\theta)] - \mathbb{E}_{\theta \sim \beta} [\ln \pi(\theta)]
+\]
+
+\subsection*{c)}
+The KL divergence between \( \beta(\theta) \) and \( \pi(\theta) \) is:
+
+\[
+KL(\beta || \pi) = \mathbb{E}_{\theta \sim \beta} \left[ \ln \beta(\theta) - \ln \pi(\theta) \right]
+\]
+
+From part (b):
+
+\[
+\mathbb{E}_{\theta \sim \beta} [\ln p(D)] = \mathbb{E}_{\theta \sim \beta} [\ln p(D | \theta)] + \mathbb{E}_{\theta \sim \beta} [\ln \alpha(\theta)] - \mathbb{E}_{\theta \sim \beta} [\ln \pi(\theta)]
+\]
+
+Rearranging:
+
+\[
+\ln p(D) = \mathbb{E}_{\theta \sim \beta} [\ln p(D | \theta)] + \mathbb{E}_{\theta \sim \beta} [\ln \alpha(\theta)] - \mathbb{E}_{\theta \sim \beta} [\ln \beta(\theta)] + \mathbb{E}_{\theta \sim \beta} [\ln \beta(\theta) - \ln \pi(\theta)]
+\]
+
+KL divergence term:
+
+\[
+\ln p(D) = \mathbb{E}_{\theta \sim \beta} [\ln p(D | \theta)] + \mathbb{E}_{\theta \sim \beta} [\ln \alpha(\theta)] - \mathbb{E}_{\theta \sim \beta} [\ln \beta(\theta)] + KL(\beta || \pi)
+\]
+
+Since \( KL(\beta || \pi) \geq 0 \), we obtain the ELBO:
+
+\[
+\ln p(D) \geq \mathbb{E}_{\theta \sim \beta} [\ln p(D | \theta)] - KL(\beta || \alpha)
+\]
+
+\subsection*{d)} 
+In machine learning we approximate a posterior \( p(\theta | D) \) with a simpler distribution \( \beta(\theta) \). The ELBO provides an optimization objective for learning \( \beta(\theta) \):
+
+1. Maximizing the ELBO means finding the best approximation \( \beta(\theta) \) to the true posterior \( p(\theta | D) \).
+
+2. The first term, \( \mathbb{E}_{\theta \sim \beta} [\ln p(D | \theta)] \), is the expected likelihood of the data, encouraging \( \beta \) to fit the data well.
+
+3. The second term, \( -KL(\beta || \alpha) \), regularizes \( \beta \), ensuring it does not deviate too far from the prior \( \alpha(\theta) \).
+
+\end{document}
