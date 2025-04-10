@@ -1,0 +1,168 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Information theory TP3}
+\author{Petko Petkov}
+
+\begin{document}
+
+\date{April 2025}
+\maketitle
+
+\section*{Exercise 1}
+
+\[
+p(x|\mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)
+\]
+The log-likelihood is:
+\[
+\log p(x|\mu, \sigma^2) = -\frac{1}{2} \log(2\pi) - \frac{1}{2} \log(\sigma^2) - \frac{(x-\mu)^2}{2\sigma^2}
+\]
+We treat $\sigma^2$ as a single parameter.
+
+The Fisher Information matrix $I(\mu, \sigma^2)$ has elements $I_{ij} = -E\left[\frac{\partial^2 \log p(x|\mu, \sigma^2)}{\partial \theta_i \partial \theta_j}\right]$.
+
+First derivatives:
+\[
+\frac{\partial \log p}{\partial \mu} = \frac{x-\mu}{\sigma^2}
+\]
+\[
+\frac{\partial \log p}{\partial (\sigma^2)} = -\frac{1}{2\sigma^2} + \frac{(x-\mu)^2}{2(\sigma^2)^2}
+\]
+
+Second derivatives:
+\[
+\frac{\partial^2 \log p}{\partial \mu^2} = -\frac{1}{\sigma^2}
+\]
+\[
+\frac{\partial^2 \log p}{\partial (\sigma^2)^2} = \frac{1}{2(\sigma^2)^2} - \frac{(x-\mu)^2}{(\sigma^2)^3}
+\]
+\[
+\frac{\partial^2 \log p}{\partial \mu \partial (\sigma^2)} = \frac{\partial}{\partial (\sigma^2)} \left( \frac{x-\mu}{\sigma^2} \right) = -\frac{x-\mu}{(\sigma^2)^2}
+\]
+Since the matrix is symmetric, $\frac{\partial^2 \log p}{\partial (\sigma^2) \partial \mu} = -\frac{x-\mu}{(\sigma^2)^2}$.
+
+Compute the negative expectations:
+\[
+I_{\mu, \mu} = -E\left[ \frac{\partial^2 \log p}{\partial \mu^2} \right] = -E\left[ -\frac{1}{\sigma^2} \right] = \frac{1}{\sigma^2}
+\]
+\[
+I_{\sigma^2, \sigma^2} = -E\left[ \frac{\partial^2 \log p}{\partial (\sigma^2)^2} \right] = -E\left[ \frac{1}{2(\sigma^2)^2} - \frac{(x-\mu)^2}{(\sigma^2)^3} \right]
+\]
+Using $E[(x-\mu)^2] = \sigma^2$:
+\[
+I_{\sigma^2, \sigma^2} = -\left( \frac{1}{2(\sigma^2)^2} - \frac{E[(x-\mu)^2]}{(\sigma^2)^3} \right) = -\left( \frac{1}{2(\sigma^2)^2} - \frac{\sigma^2}{(\sigma^2)^3} \right) = -\left( \frac{1}{2(\sigma^2)^2} - \frac{1}{(\sigma^2)^2} \right) = \frac{1}{2(\sigma^2)^2}
+\]
+\[
+I_{\mu, \sigma^2} = -E\left[ \frac{\partial^2 \log p}{\partial \mu \partial (\sigma^2)} \right] = -E\left[ -\frac{x-\mu}{(\sigma^2)^2} \right] = \frac{E[x-\mu]}{(\sigma^2)^2}
+\]
+Using $E[x-\mu] = E[x] - \mu = \mu - \mu = 0$:
+\[
+I_{\mu, \sigma^2} = 0
+\]
+Similarly, $I_{\sigma^2, \mu} = 0$.
+
+The Fisher Information Matrix is:
+\[
+I(\mu, \sigma^2) = 
+\begin{pmatrix}
+I_{\mu, \mu} & I_{\mu, \sigma^2} \\
+I_{\sigma^2, \mu} & I_{\sigma^2, \sigma^2}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\frac{1}{\sigma^2} & 0 \\
+0 & \frac{1}{2(\sigma^2)^2}
+\end{pmatrix}
+\]
+
+\subsection*{Cramer-Rao Bound for \(\mu\)}
+Unbiased estimator for $\mu$: $\hat{\mu} = \frac{1}{N} \sum_{k=1}^N x_k$.
+The variance of this estimator is:
+\[
+\text{Var}(\hat{\mu}) = \text{Var}\left(\frac{1}{N} \sum_{k=1}^N x_k\right) = \frac{1}{N^2} \sum_{k=1}^N \text{Var}(x_k) = \frac{1}{N^2} N \sigma^2 = \frac{\sigma^2}{N}
+\]
+The Cramer-Rao Bound (CRB) for an unbiased estimator of $\mu$ is given by:
+\[
+\text{Var}(\hat{\mu}) \ge \frac{1}{N I_{\mu, \mu}} 
+\]
+Since the Fisher Information Matrix is diagonal, $I_{\mu, \mu}$ is the relevant component, which is $(I^{-1})_{\mu, \mu} = 1/I_{\mu, \mu}$.
+\[
+\text{CRB} = \frac{1}{N \left(\frac{1}{\sigma^2}\right)} = \frac{\sigma^2}{N}
+\]
+Comparing the variance and the bound:
+\[
+\text{Var}(\hat{\mu}) = \frac{\sigma^2}{N} = \text{CRB}
+\]
+The sample mean $\hat{\mu}$ is an efficient estimator for the mean $\mu$ of a Gaussian distribution as it attains the Cramer-Rao bound.
+
+\subsection*{Cramer-Rao Bound for \(\sigma^2\)}
+The unbiased estimator for $\sigma^2$: $\hat{\sigma}^2 = \frac{1}{N-1} \sum_{k=1}^N (x_k - \hat{\mu})^2$, where $\hat{\mu}$ is the sample mean.
+The variance of this estimator for a Gaussian distribution is:
+\[
+\text{Var}(\hat{\sigma}^2) = \frac{2(\sigma^2)^2}{N-1}
+\]
+The Cramer-Rao Bound (CRB) for an unbiased estimator of $\sigma^2$ is given by:
+\[
+\text{Var}(\hat{\sigma}^2) \ge \frac{1}{N I_{\sigma^2, \sigma^2}} 
+\]
+Using the diagonal nature of $I$.
+\[
+\text{CRB} = \frac{1}{N \left(\frac{1}{2(\sigma^2)^2}\right)} = \frac{2(\sigma^2)^2}{N}
+\]
+Comparing the variance and the bound:
+\[
+\text{Var}(\hat{\sigma}^2) = \frac{2(\sigma^2)^2}{N-1} > \frac{2(\sigma^2)^2}{N} = \text{CRB} \quad (\text{for } N>1)
+\]
+The unbiased sample variance $\hat{\sigma}^2$ does not attain the Cramer-Rao bound for finite $N$, but it is asymptotically efficient ($\lim_{N\to\infty} \frac{N}{N-1} = 1$).
+
+
+\section*{Exercise 2}
+
+We have a Bernoulli random variable with $P(X=1|\theta) = \theta$ and $P(X=0|\theta) = 1-\theta$.
+The probability mass function is $p(x|\theta) = \theta^x (1-\theta)^{1-x}$ for $x \in \{0, 1\}$.
+The log-likelihood is:
+\[
+\log p(x|\theta) = x \log \theta + (1-x) \log(1-\theta)
+\]
+First derivative w.r.t. $\theta$:
+\[
+\frac{\partial \log p}{\partial \theta} = \frac{x}{\theta} - \frac{1-x}{1-\theta}
+\]
+Second derivative w.r.t. $\theta$:
+\[
+\frac{\partial^2 \log p}{\partial \theta^2} = -\frac{x}{\theta^2} - \frac{1-x}{(1-\theta)^2}
+\]
+The Fisher Information for a single sample is $I(\theta) = -E\left[\frac{\partial^2 \log p}{\partial \theta^2}\right]$.
+The expectation is taken w.r.t. $p(x|\theta)$. We use $E[x] = \theta$.
+\[
+I(\theta) = -E\left[ -\frac{x}{\theta^2} - \frac{1-x}{(1-\theta)^2} \right] = E\left[ \frac{x}{\theta^2} \right] + E\left[ \frac{1-x}{(1-\theta)^2} \right]
+\]
+\[
+I(\theta) = \frac{E[x]}{\theta^2} + \frac{E[1-x]}{(1-\theta)^2} = \frac{\theta}{\theta^2} + \frac{1-\theta}{(1-\theta)^2} = \frac{1}{\theta} + \frac{1}{1-\theta}
+\]
+\[
+I(\theta) = \frac{1-\theta + \theta}{\theta(1-\theta)} = \frac{1}{\theta(1-\theta)}
+\]
+The unbiased estimator for $\theta$ is the sample mean: $\hat{\theta} = \frac{1}{N} \sum_{k=1}^N x_k$.
+The variance of a single Bernoulli trial is $\text{Var}(X) = E[X^2] - (E[X])^2 = \theta - \theta^2 = \theta(1-\theta)$.
+The variance of the estimator $\hat{\theta}$ is:
+\[
+\text{Var}(\hat{\theta}) = \text{Var}\left(\frac{1}{N} \sum_{k=1}^N x_k\right) = \frac{1}{N^2} \sum_{k=1}^N \text{Var}(x_k) = \frac{1}{N^2} N \theta(1-\theta) = \frac{\theta(1-\theta)}{N}
+\]
+The Cramer-Rao Bound (CRB) for an unbiased estimator of $\theta$ is:
+\[
+\text{Var}(\hat{\theta}) \ge \frac{1}{N I(\theta)}
+\]
+\[
+\text{CRB} = \frac{1}{N \left(\frac{1}{\theta(1-\theta)}\right)} = \frac{\theta(1-\theta)}{N}
+\]
+Comparing the variance and the bound:
+\[
+\text{Var}(\hat{\theta}) = \frac{\theta(1-\theta)}{N} = \text{CRB}
+\]
+The sample mean $\hat{\theta}$ is an efficient estimator for the parameter $\theta$ of a Bernoulli distribution as it attains the Cramer-Rao bound.
+
+\end{document}
